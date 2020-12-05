@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>
+        d8 deploy tool
+    </title>
+    <style>
+        select
+        {
+            min-width: 250px;
+        }
+        input
+        {
+            min-width: 250px;
+        }
+        td
+        {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div style = "margin-left: 48px;">
+        <form action = "{{ url_for('index') }}" method = "POST">
+            <table>
+                <tr>
+                    <td>
+                        <label for = "the_stand_select">Stand:</label>
+                    </td>
+                    <td>
+                        <select id = "the_stand_select" name = "the_stand">
+                            {% if context.stands %}
+                                {% for the_option in context.stands %}
+                                    <option>{{ the_option }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for = "the_branch_input">Branch to deploy:</label>
+                    </td>
+                    <td>
+                        <input id = "the_branch_input" type = "text" name = "the_branch" value = "master"><br>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan = 2 align = center>
+                        <input id = "" type = "submit" name = "submit" value = "Deploy">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+<hr>
+</body>
+</html>

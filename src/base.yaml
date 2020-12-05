@@ -1,0 +1,15 @@
+---
+- stand:
+    name: ""
+    info:
+        - step:
+              description: ""
+              path: ""
+              user: ""
+              command: ""
+    steps:
+        - step:
+              description: ""
+              path: ""
+              user: ""
+              command: ""
