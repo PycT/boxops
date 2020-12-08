@@ -20,7 +20,8 @@
 </head>
 <body>
     <div style = "margin-left: 48px;">
-        <form action = "{{ url_for('index') }}" method = "POST">
+        <form action = "{{ url_for('index') }}" method = "POST"
+              onsubmit = "document.getElementById('deploy_submit').innerHTML = '<h2>Deploy takes up to 5 minutes. Wait.</h2>';">
             <table>
                 <tr>
                     <td>
@@ -46,12 +47,29 @@
                 </tr>
                 <tr>
                     <td colspan = 2 align = center>
-                        <input id = "" type = "submit" name = "submit" value = "Deploy">
+                        {% if not context.deploy_in_progress %}
+                            <div id = "deploy_submit">
+                                <input id = "" type = "submit" name = "submit" value = "Deploy">
+                            </div>
+                        {% else %}
+                            <h2>Deploy in progress, try 5 minutes later</h2>
+                        {% endif %}
                     </td>
                 </tr>
             </table>
         </form>
     </div>
 <hr>
+    {% if context.the_branch %}
+        <b>The branch</b>: {{ context.the_branch }}<br>
+    {% endif %}
+    {% if context.the_stand %}
+        <b>The stand</b>: {{ context.the_stand }}<br>
+    {% endif %}
+    {% if context.scenario_output %}
+        <br>
+        <br>
+        {{ context.scenario_output|safe }}
+    {% endif %}
 </body>
 </html>

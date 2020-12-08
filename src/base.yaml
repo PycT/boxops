@@ -1,15 +1,17 @@
 ---
-- stand:
-    name: ""
-    info:
+- stand:  # might be multiple, for every stand is its own scenario defined by consequent steps
+    name: ""  # to show in select on a web-ui
+    info:  # a scenario to execute to show info
         - step:
-              description: ""
-              path: ""
-              user: ""
-              command: ""
-    steps:
+              description: ""  # to be written into log
+              path: ""  # to be changed to before command execution
+              user: ""  # under who's account the command will be executed
+              command: ""  # the command to execute
+    steps:  # main deploy scenario
         - step:
-              description: ""
-              path: ""
-              user: ""
-              command: ""
+              description: ""  # to be written into log
+              path: ""  # to be changed to before command execution
+              user: ""  # under who's account the command will be executed
+              command: ""  # the command to execute
+
+# "Git branch" is a reserved description for the command '"git checkout {}".format(the_branch)' called from a main script
