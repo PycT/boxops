@@ -1,6 +1,8 @@
 ---
 - stand:
-    name: ""
+    name: "test"
+    webhooks:
+      discord: ""
     info:
         - step:
               description: ""

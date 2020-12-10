@@ -1,6 +1,8 @@
 ---
 - stand:  # might be multiple, for every stand is its own scenario defined by consequent steps
     name: ""  # to show in select on a web-ui
+    webhooks: # webhooks' urls
+      discord: ""  # discord webhook url (currently discord only supported)
     info:  # a scenario to execute to show info
         - step:
               description: ""  # to be written into log

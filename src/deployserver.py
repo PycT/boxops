@@ -3,6 +3,8 @@ import subprocess
 import os
 from rhythmic import Logger
 from yaml import safe_load as yaml_load
+import requests
+import json
 
 path_to_log = os.getcwd()
 blocker = path_to_log + "/deploy.blk"
@@ -28,6 +30,21 @@ def get_steps(deploy_configuration, the_stand):
 
     return steps
 
+def get_webhooks(deploy_configuration, the_stand):
+
+    webhooks = {}
+    for stand in deploy_configuration:
+        if stand["stand"]["name"] == the_stand:
+
+            # Dicord:
+            try:
+                webhooks["discord"] = stand["stand"]["webhooks"]["discord"]
+            except Exception as e:
+                print(e)
+
+            break
+
+    return webhooks
 
 def execute_step(step):
     """
@@ -100,6 +117,20 @@ def execute_step(step):
     return operation_output + "\n --- \n"
 
 
+def execute_webhooks(webhooks, the_stand, the_branch):
+
+    # Discord
+    the_url = webhooks["discord"]
+    the_headers = {
+        "Content-Type": "application/json"
+    }
+    the_payload = {
+        "content": """@here Deploy in progress. 
+        \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
+    }
+
+    requests.request(post, the_url, data=the_payload, headers=the_headers)
+
 deploy_configuration = get_deploy_configuration()
 
 app = Flask(__name__)
@@ -131,6 +162,11 @@ def index():
 
         deploy_logger.writeDown(the_stand)
         deploy_logger.writeDown(the_branch)
+
+        webhooks = get_webhooks(deploy_configuration, the_stand)
+        if len(webhooks) > 0:
+            execute_webhooks(webhooks, the_stand, the_branch)
+
 
         scenario = get_steps(deploy_configuration, the_stand)
         scenario_output = ""
