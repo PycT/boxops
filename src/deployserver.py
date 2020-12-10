@@ -117,7 +117,7 @@ def execute_step(step):
     return operation_output + "\n --- \n"
 
 
-def execute_webhooks(webhooks, the_stand, the_branch):
+def execute_webhooks(webhooks, the_message):
 
     # Discord
     the_url = webhooks["discord"]
@@ -125,8 +125,7 @@ def execute_webhooks(webhooks, the_stand, the_branch):
         "Content-Type": "application/json"
     }
     webhook_data = {
-        "content": """@here Deploy in progress. 
-        \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
+        "content": the_message
     }
 
     the_payload = json.dumps(webhook_data)
@@ -170,7 +169,9 @@ def index():
 
         webhooks = get_webhooks(deploy_configuration, the_stand)
         if len(webhooks) > 0:
-            execute_webhooks(webhooks, the_stand, the_branch)
+            the_start_message = """@here Deploy in progress. 
+            \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
+            execute_webhooks(webhooks, the_start_message)
 
 
         scenario = get_steps(deploy_configuration, the_stand)
@@ -187,6 +188,11 @@ def index():
         context["scenario_output"] = scenario_output.replace("\n","<br>")
 
         os.remove(blocker)
+
+        if len(webhooks) > 0:
+            the_end_message = """@here Deploy complete. 
+            \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
+            execute_webhooks(webhooks, the_end_message)
 
     return render_template("deploy.html", context=context)
 
