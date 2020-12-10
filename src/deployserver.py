@@ -124,12 +124,17 @@ def execute_webhooks(webhooks, the_stand, the_branch):
     the_headers = {
         "Content-Type": "application/json"
     }
-    the_payload = {
+    webhook_data = {
         "content": """@here Deploy in progress. 
         \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
     }
 
-    requests.request(post, the_url, data=the_payload, headers=the_headers)
+    the_payload = json.dumps(webhook_data)
+
+    request_result = requests.request("post", the_url, data=the_payload, headers=the_headers)
+
+    return request_result
+
 
 deploy_configuration = get_deploy_configuration()
 
