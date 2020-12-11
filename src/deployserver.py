@@ -6,12 +6,150 @@ from yaml import safe_load as yaml_load
 import requests
 import json
 
-path_to_log = os.getcwd()
-blocker = path_to_log + "/deploy.blk"
+working_dir = os.getcwd()
+blocker = working_dir + "/deploy.blk"
+path_to_config = working_dir + "/stands-enabled"
 
 
-deploy_logger = Logger(log_filename_postfix = "deploy", path_to_log = path_to_log)
-deploy_logger.writeDown("=========== Deployer Service Start ==============")
+# deploy_logger = Logger(log_filename_postfix = "deploy", path_to_log = working_dir)
+# deploy_logger.writeDown("=========== Deployer Service Start ==============")
+
+def test_stand_configuration(stand_configuration):
+
+    def is_class(the_entity, class_name):
+
+        if the_entity.__class__.__name__ == class_name:
+            return True
+        else:
+            return False
+
+    def test_step(step):
+
+        if not is_class(step, "dict"):
+            print("Step configuration wrong")
+            return False
+
+        try:
+            if not is_class(step["description"], "str"):
+                print("Step description configuration is wrong")
+                return False
+        except Exception as e:
+            print("{} not set but it is ok.".format(e))
+
+        try:
+            if not is_class(step["path"], "str"):
+                print("Step path configuration is wrong")
+                return False
+        except Exception as e:
+            print("{} not set but it is ok.".format(e))
+
+        try:
+            if not is_class(step["user"], "str"):
+                print("Step user configuration is wrong")
+                return False
+        except Exception as e:
+            print("{} not set but it is ok.".format(e))
+
+        try:
+            if not is_class(step["command"], "str"):
+                print("Step command configuration is wrong")
+                return False
+        except Exception as e:
+            print(e)
+            print("The step has to have a command")
+            return False
+
+        return True
+
+    def test_webhooks(stand):
+
+        try:
+            if not is_class(stand["webhooks"], "dict"):
+                print("Webhooks configuration is wrong")
+                return False
+        except Exception as e:
+            print("{} not set but it is ok.".format(e))
+
+        try:
+            if not is_class(stand["webhooks"]["discord"], "str"):
+                print("Discord webhook configuration is wrong")
+                return False
+        except Exception as e:
+            print("{} not set but it is ok.".format(e))
+
+        return True
+
+    if not is_class(stand_configuration, "dict"):
+        print("Configuration file is wrong")
+        return False
+
+    # Test for stand in yaml
+    try:
+        if not is_class(stand_configuration["stand"], "dict"):
+            print("Stand configuration is wrong")
+            return False
+    except Exception as e:
+        print(e)
+        print("Stand not found")
+        return False
+
+    # test for stand name presence
+    try:
+        if not is_class(stand_configuration["stand"]["name"], "str"):
+            print("Stand has to have a name")
+    except Exception as e:
+        print(e)
+        print("Stand has to have a name")
+        return False
+
+    # test webhooks if present
+    if not test_webhooks(stand_configuration["stand"]):
+        print("Webhooks configuration is wrong")
+        return False
+
+    # test info steps
+    try:
+        if is_class(stand_configuration["stand"]["info"], "list"):
+            step_counter = 0
+            for the_step in stand_configuration["stand"]["info"]:
+                step_counter += 1
+                print("Testing info step {}".format(step_counter))
+                if not test_step(the_step["step"]):
+                    print("Info step {} is misconfigured".format(step_counter))
+                    return False
+    except Exception as e:
+        print("{} is not set and it is ok".format(e))
+
+    # test steps
+    try:
+        if not is_class(stand_configuration["stand"]["steps"], "list"):
+            print("Stand steps configuration is wrong")
+            return False
+    except Exception as e:
+        print(e)
+        print("Stand must have steps to be configures")
+        return False
+
+    step_counter = 0
+    for the_step in stand_configuration["stand"]["steps"]:
+        step_counter += 1
+        print("Testing scenario step {}".format(step_counter))
+        if not test_step(the_step["step"]):
+            print("Step {} is misconfigured".format(step_counter))
+            return False
+
+    return True
+
+def load_stand_configuration(config_file_name):
+
+    with open(config_file_name, "r") as stand_configuration_file:
+        try:
+            stand_configuration = yaml_load(stand_configuration_file)
+        except Exception as e:
+            print(e)
+            stand_configuration = False
+
+    return stand_configuration
 
 def get_deploy_configuration():
 

@@ -1,0 +1,17 @@
+---
+- stand:
+    name: "Pew-pew!"
+    webhooks:
+      discord: "https://discordapp.com/api/webhooks/786861981508304907/QTwFC3CytnZ3ujmkS-xWJz2xHKoX-T5B3CXewfD1BYs94_cX2C7thHzHLgutvy1KvT7r"
+    info:
+        - step:
+              description: "Info step"
+              path: ""
+              user: ""
+              command: "printf 'hi!'"
+    steps:
+        - step:
+              description: "Action"
+              path: ""
+              user: ""
+              command: "printf 'Action!'"
