@@ -307,7 +307,7 @@ def index():
 
         webhooks = get_webhooks(deploy_configuration, the_stand)
         if len(webhooks) > 0:
-            the_start_message = """@here Deploy in progress. 
+            the_start_message = """Deploy in progress. 
             \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
             execute_webhooks(webhooks, the_start_message)
 
@@ -328,7 +328,7 @@ def index():
         os.remove(blocker)
 
         if len(webhooks) > 0:
-            the_end_message = """@here Deploy complete. 
+            the_end_message = """\n---\n Deploy complete. 
             \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
             execute_webhooks(webhooks, the_end_message)
 
