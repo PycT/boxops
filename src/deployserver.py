@@ -11,8 +11,9 @@ blocker = working_dir + "/deploy.blk"
 path_to_config = working_dir + "/stands-enabled"
 
 
-# deploy_logger = Logger(log_filename_postfix = "deploy", path_to_log = working_dir)
+deploy_logger = Logger(log_filename_postfix="deploy", path_to_log=working_dir)
 # deploy_logger.writeDown("=========== Deployer Service Start ==============")
+
 
 def test_stand_configuration(stand_configuration):
 
@@ -79,13 +80,13 @@ def test_stand_configuration(stand_configuration):
 
         return True
 
-    if not is_class(stand_configuration, "dict"):
-        print("Configuration file is wrong")
-        return False
+    # if not is_class(stand_configuration, "dict"):
+    #     print("Configuration file is wrong")
+    #     return False
 
     # Test for stand in yaml
     try:
-        if not is_class(stand_configuration["stand"], "dict"):
+        if not is_class(stand_configuration, "dict"):
             print("Stand configuration is wrong")
             return False
     except Exception as e:
@@ -95,7 +96,7 @@ def test_stand_configuration(stand_configuration):
 
     # test for stand name presence
     try:
-        if not is_class(stand_configuration["stand"]["name"], "str"):
+        if not is_class(stand_configuration["name"], "str"):
             print("Stand has to have a name")
     except Exception as e:
         print(e)
@@ -103,15 +104,15 @@ def test_stand_configuration(stand_configuration):
         return False
 
     # test webhooks if present
-    if not test_webhooks(stand_configuration["stand"]):
+    if not test_webhooks(stand_configuration):
         print("Webhooks configuration is wrong")
         return False
 
     # test info steps
     try:
-        if is_class(stand_configuration["stand"]["info"], "list"):
+        if is_class(stand_configuration["info"], "list"):
             step_counter = 0
-            for the_step in stand_configuration["stand"]["info"]:
+            for the_step in stand_configuration["info"]:
                 step_counter += 1
                 print("Testing info step {}".format(step_counter))
                 if not test_step(the_step["step"]):
@@ -122,16 +123,16 @@ def test_stand_configuration(stand_configuration):
 
     # test steps
     try:
-        if not is_class(stand_configuration["stand"]["steps"], "list"):
+        if not is_class(stand_configuration["steps"], "list"):
             print("Stand steps configuration is wrong")
             return False
     except Exception as e:
         print(e)
-        print("Stand must have steps to be configures")
+        print("Stand must have steps to be configured")
         return False
 
     step_counter = 0
-    for the_step in stand_configuration["stand"]["steps"]:
+    for the_step in stand_configuration["steps"]:
         step_counter += 1
         print("Testing scenario step {}".format(step_counter))
         if not test_step(the_step["step"]):
@@ -139,6 +140,7 @@ def test_stand_configuration(stand_configuration):
             return False
 
     return True
+
 
 def load_stand_configuration(config_file_name):
 
@@ -151,38 +153,54 @@ def load_stand_configuration(config_file_name):
 
     return stand_configuration
 
-def get_deploy_configuration():
 
-    with open("config.yaml", "r") as config_yaml:
-        deploy_configuration = yaml_load(config_yaml)
+def get_deploy_configuration(path_to_config=path_to_config):
+
+    deploy_configuration = []
+
+    config_dir_content = os.listdir(path_to_config)
+    for an_item in config_dir_content:
+        the_loadable = "{}/{}".format(path_to_config, an_item)
+        if os.path.isfile(the_loadable):
+            print("----------------------")
+            print(an_item)
+            with open(the_loadable, "r") as config_yaml:
+                deploy_configuration_candidate = yaml_load(config_yaml)
+                print(deploy_configuration_candidate)
+                if test_stand_configuration(deploy_configuration_candidate):
+                    print("{} is added to deployer configuration".format(an_item))
+                    deploy_configuration.append(deploy_configuration_candidate)
 
     return deploy_configuration
+
 
 def get_steps(deploy_configuration, the_stand):
 
     steps = {}
     for stand in deploy_configuration:
-        if stand["stand"]["name"] == the_stand:
-            steps = stand["stand"]["steps"]
+        if stand["name"] == the_stand:
+            steps = stand["steps"]
             break
 
     return steps
+
 
 def get_webhooks(deploy_configuration, the_stand):
 
     webhooks = {}
     for stand in deploy_configuration:
-        if stand["stand"]["name"] == the_stand:
+        if stand["name"] == the_stand:
 
             # Dicord:
             try:
-                webhooks["discord"] = stand["stand"]["webhooks"]["discord"]
+                webhooks["discord"] = stand["webhooks"]["discord"]
             except Exception as e:
                 print(e)
 
             break
 
     return webhooks
+
 
 def execute_step(step):
     """
@@ -213,12 +231,11 @@ def execute_step(step):
         print(e)
         # operation_output += repr(e) + "\n\n"
 
-
     user_path = ""
 
     try:
         if len(step["path"]) > 0:
-            if len(the_user)== 0:
+            if len(the_user) == 0:
                 os.chdir(step["path"])
             else:
                 user_path = step["path"]
@@ -234,15 +251,15 @@ def execute_step(step):
                     user_command = "cd {}; ".format(user_path) + step["command"]
                 else:
                     user_command = step["command"]
-		
-                process_result = subprocess.run(\
-                                    ["runuser", "-l", the_user, "-c", user_command],\
-                                    stdout = subprocess.PIPE, stderr = subprocess.STDOUT\
+
+                process_result = subprocess.run(
+                                    ["runuser", "-l", the_user, "-c", user_command],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT
                                  )
             else:
-                process_result = subprocess.run(\
-                                    step["command"].split(" "),\
-                                    stdout = subprocess.PIPE, stderr = subprocess.STDOUT\
+                process_result = subprocess.run(
+                                    step["command"].split(" "),
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT
                                  )
             execution_output += process_result.stdout.decode()
             deploy_logger.writeDown(execution_output)
@@ -277,6 +294,7 @@ deploy_configuration = get_deploy_configuration()
 
 app = Flask(__name__)
 
+
 @app.route("/", methods=["POST", "GET"])
 @app.route("/index", methods=["POST", "GET"])
 def index():
@@ -288,7 +306,7 @@ def index():
     }
 
     for stand in deploy_configuration:
-        context["stands"].append(stand["stand"]["name"])
+        context["stands"].append(stand["name"])
 
     if os.path.exists(blocker):
         context["deploy_in_progress"] = True
@@ -311,7 +329,6 @@ def index():
             \n The stand: ```{}``` \n The branch: ```{}```""".format(the_stand, the_branch)
             execute_webhooks(webhooks, the_start_message)
 
-
         scenario = get_steps(deploy_configuration, the_stand)
         scenario_output = ""
 
@@ -323,7 +340,7 @@ def index():
 
         context["the_stand"] = the_stand
         context["the_branch"] = the_branch
-        context["scenario_output"] = scenario_output.replace("\n","<br>")
+        context["scenario_output"] = scenario_output.replace("\n", "<br>")
 
         os.remove(blocker)
 
@@ -336,7 +353,8 @@ def index():
 
 
 def main():
-    app.run(debug = False, host="0.0.0.0", port = "5100")
+    app.run(debug=False, host="0.0.0.0", port="5100")
+
 
 if __name__ == "__main__":
     main()
