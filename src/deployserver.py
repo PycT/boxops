@@ -12,7 +12,7 @@ path_to_config = working_dir + "/stands-enabled"
 
 
 deploy_logger = Logger(log_filename_postfix="deploy", path_to_log=working_dir)
-# deploy_logger.writeDown("=========== Deployer Service Start ==============")
+deploy_logger.writeDown("=========== Deployer Service Start ==============")
 
 
 def test_stand_configuration(stand_configuration):
