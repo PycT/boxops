@@ -1,17 +1,16 @@
 ---
-- stand:
-    name: "test"
-    webhooks:
-      discord: ""
-    info:
-        - step:
-              description: ""
-              path: ""
-              user: ""
-              command: ""
-    steps:
-        - step:
-              description: ""
-              path: ""
-              user: ""
-              command: ""
+name: "test"
+webhooks:
+  discord: ""
+info:
+    - step:
+          description: ""
+          path: ""
+          user: ""
+          command: ""
+steps:
+    - step:
+          description: ""
+          path: ""
+          user: ""
+          command: ""
