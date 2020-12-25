@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>
-        d8 deploy tool
+        boxops deploy tool
     </title>
     <style>
         select
@@ -31,7 +31,11 @@
                         <select id = "the_stand_select" name = "the_stand">
                             {% if context.stands %}
                                 {% for the_option in context.stands %}
-                                    <option>{{ the_option }}</option>
+                                    {% if context.the_stand == the_option %}
+                                        <option selected>{{ the_option }}</option>
+                                    {% else %}
+                                        <option>{{ the_option }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             {% endif %}
                         </select>
@@ -42,7 +46,11 @@
                         <label for = "the_branch_input">Branch to deploy:</label>
                     </td>
                     <td>
-                        <input id = "the_branch_input" type = "text" name = "the_branch" value = "master"><br>
+                        {% if context.the_branch %}
+                            <input id = "the_branch_input" type = "text" name = "the_branch" value = "{{ context.the_branch }}"><br>
+                        {% else %}
+                            <input id = "the_branch_input" type = "text" name = "the_branch" value = "master"><br>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -54,6 +62,8 @@
                         {% else %}
                             <h2>Deploy in progress, try 5 minutes later</h2>
                         {% endif %}
+                        <hr>
+                        <h1><a href="/">HOME</a></h1>
                     </td>
                 </tr>
             </table>

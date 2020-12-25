@@ -1,0 +1,16 @@
+---
+name: "Pew-pe1w!"
+webhooks:
+  discord: ""
+info:
+  - step:
+        description: "Info step"
+        path: ""
+        user: ""
+        command: "printf 'hi!'"
+steps:
+  - step:
+        description: "Action"
+        path: ""
+        user: ""
+        command: "printf 'Action!'"
