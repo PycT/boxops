@@ -80,10 +80,6 @@ def test_stand_configuration(stand_configuration):
 
         return True
 
-    # if not is_class(stand_configuration, "dict"):
-    #     print("Configuration file is wrong")
-    #     return False
-
     # Test for stand in yaml
     try:
         if not is_class(stand_configuration, "dict"):
@@ -164,12 +160,14 @@ def get_deploy_configuration(path_to_config=path_to_config):
         if os.path.isfile(the_loadable):
             print("----------------------")
             print(an_item)
-            with open(the_loadable, "r") as config_yaml:
-                deploy_configuration_candidate = yaml_load(config_yaml)
-                print(deploy_configuration_candidate)
-                if test_stand_configuration(deploy_configuration_candidate):
-                    print("{} is added to deployer configuration".format(an_item))
-                    deploy_configuration.append(deploy_configuration_candidate)
+            try:
+                with open(the_loadable, "r") as config_yaml:
+                    deploy_configuration_candidate = yaml_load(config_yaml)
+                    if test_stand_configuration(deploy_configuration_candidate):
+                        print("{} is added to deployer configuration".format(an_item))
+                        deploy_configuration.append(deploy_configuration_candidate)
+            except Exception as e:
+                print(e)
 
     return deploy_configuration
 
@@ -221,7 +219,7 @@ def execute_step(step):
             operation_output += " step\n "
     except Exception as e:
         print(e)
-#         operation_output += repr(e) + "\n\n"
+        operation_output += repr(e) + "\n\n"
 
     the_user = ""
 
@@ -229,7 +227,7 @@ def execute_step(step):
         the_user = step["user"]
     except Exception as e:
         print(e)
-        # operation_output += repr(e) + "\n\n"
+        operation_output += repr(e) + "\n\n"
 
     user_path = ""
 
