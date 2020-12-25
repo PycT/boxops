@@ -274,6 +274,9 @@ def execute_webhooks(webhooks, the_message):
 
     # Discord
     the_url = webhooks["discord"]
+    if the_url == "":
+        return False
+
     the_headers = {
         "Content-Type": "application/json"
     }
@@ -283,7 +286,10 @@ def execute_webhooks(webhooks, the_message):
 
     the_payload = json.dumps(webhook_data)
 
-    request_result = requests.request("post", the_url, data=the_payload, headers=the_headers)
+    try:
+        request_result = requests.request("post", the_url, data=the_payload, headers=the_headers)
+    except Exception as e:
+        print(e)
 
     return request_result
 
@@ -300,7 +306,8 @@ def index():
     deploy_logger.writeDown(request.method)
     context = {
         "stands": [],
-        "deploy_in_progress": False
+        "deploy_in_progress": False,
+        "the_stand": ""
     }
 
     for stand in deploy_configuration:
@@ -317,6 +324,8 @@ def index():
 
         the_stand = request.values["the_stand"]
         the_branch = request.values["the_branch"]
+        context["the_stand"] = the_stand
+        context["the_branch"] = the_branch
 
         deploy_logger.writeDown(the_stand)
         deploy_logger.writeDown(the_branch)
