@@ -1,0 +1,26 @@
+# * drill - a scenario with tasks
+# * task - and end-unit ot execute
+# * argument - a variable parameter to use within a task
+---
+name: "pew-pew!"  # required
+tasks:  # required
+  - task:  # required at least 1
+      name: "first task"  # required
+      args:
+        message: "this is a message"
+      action: "printf \"{message}\""
+      webhook:
+        url: "https://discord.com/api/webhooks/798456482466627594/u3xQJY_dveJpW88_7WmtQSV9uUk02I0SW-CMOlBYa5HPANc4LIz3kcplLC8MyomYK8Xu"
+        headers:
+          key: value
+        data:
+          key: value
+  - task:  # required at least 1
+      name: "second task"  # required
+      webhook:
+        url: "https://discord.com/api/webhooks/798456482466627594/u3xQJY_dveJpW88_7WmtQSV9uUk02I0SW-CMOlBYa5HPANc4LIz3kcplLC8MyomYK8Xu"
+        headers:
+          key: value
+        data:
+          key: value
+

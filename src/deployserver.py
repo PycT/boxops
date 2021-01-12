@@ -137,19 +137,6 @@ def test_stand_configuration(stand_configuration):
 
     return True
 
-
-def load_stand_configuration(config_file_name):
-
-    with open(config_file_name, "r") as stand_configuration_file:
-        try:
-            stand_configuration = yaml_load(stand_configuration_file)
-        except Exception as e:
-            print(e)
-            stand_configuration = False
-
-    return stand_configuration
-
-
 def get_deploy_configuration(path_to_config=path_to_config):
 
     deploy_configuration = []

@@ -1,0 +1,18 @@
+# * drill - a scenario with tasks
+# * task - and end-unit ot execute
+# * argument - a variable parameter to use within a task
+---
+name: "the drill name"  # required
+tasks:  # required
+    - task:  # required at least 1
+        name: "my task"  # required
+        args:
+            arg_name1: "value1"
+            arg_nameN: "valueN"
+        action: "bash -c {arg_name1}, {arg_nameN}"
+        webhook:
+            url: "url"
+            headers:
+                key: value
+            data:
+                key: value
