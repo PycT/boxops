@@ -1,0 +1,117 @@
+<html>
+<head>
+    <title>
+        boxopsweb
+    </title>
+    <style>
+        select
+        {
+            min-width: 250px;
+        }
+        input
+        {
+            min-width: 250px;
+        }
+        td
+        {
+            padding: 8px;
+        }
+    </style>
+    <script type="application/javascript">
+
+        function get_args(){
+            the_request = new XMLHttpRequest();
+            the_url = "/args";
+            the_drill_select = document.getElementById('the_drill_select');
+            the_drill = the_drill_select.value;
+
+            the_request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    the_container_tr = document.getElementById('drill_args');
+
+                    if (this.responseText.length > 0) {
+                        the_container_tr.innerHTML = "\
+                            <td>The drill arguments: </td>\
+                            <td>" + this.responseText + "</td>\
+                    ";
+                    }
+                    else {
+                        the_container_tr.innerHTML = "\
+                            <td>&nbsp;</td>\
+                            <td>&nbsp;</td>\
+                    ";
+                    }
+                }
+            }
+
+            the_data = JSON.stringify({
+                    "the_drill": the_drill
+                }
+            );
+
+            the_request.open("POST", the_url, true);
+            the_request.send(the_data);
+
+        }
+
+    </script>
+</head>
+<body>
+<div style="margin-left: 48px;" id="the_form">
+    <form action = "{{ url_for('index') }}" method = "POST"
+          onsubmit = "document.getElementById('the_form').innerHTML = '<h2>The sequence is in progress. Wait.</h2>';">
+        <table>
+            <tr>
+                <td>
+                    <label for = "the_drill_select">Drill:</label>
+                </td>
+                <td>
+                    <select id="the_drill_select" name="the_drill" onchange="get_args();">
+                        {% if not context.the_selected_drill %}
+                            <option selected value="-none-">Select the drill to execute</option>
+                        {% endif %}
+                        {% if context.drills %}
+                        {% for the_drill in context.drills %}
+                        {% if context.the_selected_drill == the_drill.name %}
+                            <option selected>{{ the_drill.name }}</option>
+                        {% else %}
+                            <option>{{ the_drill.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </td>
+            </tr>
+            <tr id="drill_args">
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td colspan = 2 align = center>
+                    {% if not context.drill_in_progress %}
+                        <input id = "run_button" type = "submit" name = "submit" value = "Run">
+                    {% else %}
+                    <h2>The sequence is in progress, try 5 minutes later</h2>
+                    {% endif %}
+                    <hr>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<hr>
+{% if context.the_drill_selected %}
+<h2>{{ context.the_drill_selected }}</h2><br>
+{% endif %}
+{% if context.execution_output %}
+<br>
+<br>
+{{ context.execution_output|safe }}
+{% endif %}
+</body>
+</html>

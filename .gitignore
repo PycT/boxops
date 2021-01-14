@@ -5,6 +5,7 @@
 
 test.*
 .idea/
+*.log
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

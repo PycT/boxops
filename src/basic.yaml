@@ -6,13 +6,17 @@ name: "the drill name"  # required
 tasks:  # required
     - task:  # required at least 1
         name: "my task"  # required
-        args:
+        args:  # useful for boxopsweb
             arg_name1: "value1"
             arg_nameN: "valueN"
         action: "bash -c {arg_name1}, {arg_nameN}"
-        webhook:
+        user: ""  # *nix user on who's account to execute the action
+        directory: ""  # a directory to navigate to before the action execution
+        webhook:  # a post request with following headers (id present) and data (if present) is sent
             url: "url"
-            headers:
-                key: value
-            data:
-                key: value
+            headers:  # html-headers for the webhook
+                key1: value1
+                keyN: valueN
+            data:  # data to send to a webhook url
+                key1: value1
+                keyN: valueN
