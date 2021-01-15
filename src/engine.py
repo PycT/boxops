@@ -2,6 +2,8 @@ import subprocess
 import yaml
 import requests
 import json
+import copy
+
 
 def load_yaml(yaml_file_name):
 
@@ -39,6 +41,33 @@ def is_key_present(the_entity, the_key):
         return False
 
     return True
+
+
+def apply_args(the_task):
+
+    updated_task = copy.deepcopy(the_task)
+
+    if not is_key_present(the_task, "args"):
+        return updated_task
+    else:
+        for arg, value in the_task["args"].items():
+            if is_key_present(updated_task, "action"):
+                updated_task["action"] = the_task["action"].replace("{{{}}}".format(arg), value)
+            if is_key_present(updated_task, "user"):
+                updated_task["user"] = the_task["user"].replace("{{{}}}".format(arg), value)
+            if is_key_present(updated_task, "directory"):
+                updated_task["directory"] = the_task["directory"].replace("{{{}}}".format(arg), value)
+            if is_key_present(updated_task, "webhook"):
+                updated_task["webhook"]["url"] = the_task["webhook"]["url"].replace("{{{}}}".format(arg), value)
+                if is_key_present(updated_task["webhook"], "headers"):
+                    for headers_key, headers_value in the_task["webhook"]["headers"].items():
+                        updated_task["webhook"]["headers"][headers_key] = headers_value\
+                                                                            .replace("{{{}}}".format(arg), value)
+                if is_key_present(updated_task["webhook"], "data"):
+                    for data_key, data_value in the_task["webhook"]["data"].items():
+                        updated_task["webhook"]["data"][data_key] = data_value.replace("{{{}}}".format(arg), value)
+
+    return updated_task
 
 
 def test_the_drill(the_drill):
@@ -101,11 +130,6 @@ def test_the_drill(the_drill):
             if not is_class(the_task["action"], "str"):
                 print("                The action is misconfigured.")
                 return False
-            else:
-                if is_key_present(the_task, "args"):
-                    for arg, value in the_task["args"].items():
-                        the_task["action"] = the_task["action"].replace("{{{}}}".format(arg), value)
-                    print("                {}".format(the_task["action"]))
         except Exception as action_presence_exception:
             print("                {}".format(action_presence_exception))
             print("                No action specified (ok)")
@@ -147,7 +171,6 @@ def test_the_drill(the_drill):
 
                 print("                {}".format(the_task["webhook"]["url"]))
 
-
                 # Test headers
                 if is_key_present(the_task["webhook"], "headers"):
                     if not is_class(the_task["webhook"]["headers"], "dict"):
@@ -163,6 +186,10 @@ def test_the_drill(the_drill):
         except Exception as no_webhook_exception:
             print("        {}".format(no_webhook_exception))
             print("        No webhook specified (ok)")
+
+        if is_key_present(the_task, "args"):
+            parametrized_task = apply_args(the_task)
+            print("    The task with parameters applied: {}".format(parametrized_task))
 
         return True
 
@@ -195,7 +222,7 @@ def test_the_drill(the_drill):
         return False
 
     if not is_class(the_drill["tasks"], "list"):
-        print("Tasks are miskonfigured")
+        print("Tasks are misconfigured")
         return False
 
     counter = 1
@@ -212,10 +239,16 @@ def test_the_drill(the_drill):
 
 def execute_the_drill(the_drill):
 
-    def execute_the_task(the_task):
+    def execute_the_task(the_task_template):
+
+        if is_key_present(the_task_template, "args"):
+            the_task = apply_args(the_task_template)
+        else:
+            the_task = the_task_template
 
         execution_output = "\n Executing task: {} \n".format(the_task["name"])
         if is_key_present(the_task, "action"):
+
             if is_key_present(the_task, "directory"):
                 the_action = "cd {}; " + the_task["action"]
             else:
@@ -275,3 +308,29 @@ def execute_the_drill(the_drill):
         the_drill_output += execute_the_task(the_task["task"])
 
     return the_drill_output
+
+
+def update_drill_arguments(the_drill, arguments_dictionary):
+    """
+    :param the_drill
+    :param arguments_dictionary:
+    the keys must be built up from order number of a task and an argument name in the following fashion: `task1_branch`
+
+    the `branch` argument of the first task in a returned drill will have a
+    value of arguments_dictionary["task1_branch"]
+    """
+
+    updated_drill = copy.deepcopy(the_drill)
+
+    task_counter = 0
+    for the_task_dict in updated_drill["tasks"]:
+        the_task = the_task_dict["task"]
+        task_counter += 1
+        if is_key_present(the_task, "args"):
+            for arg, value in the_task["args"].items():
+                received_arg_name = "task{}_{}".format(task_counter, arg)
+                if is_key_present(arguments_dictionary, received_arg_name):
+                    updated_drill["tasks"][task_counter - 1]["task"]["args"][arg] = \
+                        arguments_dictionary[received_arg_name]
+
+    return updated_drill

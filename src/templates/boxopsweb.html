@@ -4,22 +4,19 @@
         boxopsweb
     </title>
     <style>
-        select
-        {
+        select {
             min-width: 250px;
         }
-        input
-        {
+        input {
             min-width: 250px;
         }
-        td
-        {
+        td {
             padding: 8px;
         }
     </style>
     <script type="application/javascript">
 
-        function get_args(){
+        function get_args() {
             the_request = new XMLHttpRequest();
             the_url = "/args";
             the_drill_select = document.getElementById('the_drill_select');
@@ -58,7 +55,7 @@
     </script>
 </head>
 <body>
-<div style="margin-left: 48px;" id="the_form">
+<div style="margin-left: 48px;">
     <form action = "{{ url_for('index') }}" method = "POST"
           onsubmit = "document.getElementById('the_form').innerHTML = '<h2>The sequence is in progress. Wait.</h2>';">
         <table>
@@ -92,10 +89,13 @@
                 </td>
             </tr>
             <tr>
-                <td colspan = 2 align = center>
+                <td colspan=2 align=center>
+                    <div id="the_form">
                     {% if not context.drill_in_progress %}
-                        <input id = "run_button" type = "submit" name = "submit" value = "Run">
+                        <input id="run_button" type="submit" name="submit" value="Run">
+                        <button id="reset_button">Reset</button>
                     {% else %}
+                    </div>
                     <h2>The sequence is in progress, try 5 minutes later</h2>
                     {% endif %}
                     <hr>
@@ -113,5 +113,14 @@
 <br>
 {{ context.execution_output|safe }}
 {% endif %}
+<script>
+    document.getElementById("reset_button")
+    .addEventListener("click",
+                    function(event) {
+                        event.preventDefault();
+                        window.location = "/";
+                    },
+                    false);
+</script>
 </body>
 </html>

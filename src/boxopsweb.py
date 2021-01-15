@@ -67,8 +67,26 @@ def index():
     global all_the_drills
     global boxops_configuration
     context = {
-        "drills": all_the_drills,
+        "drills": all_the_drills
     }
+
+    if request.method == "POST":
+        the_data = request.form
+        drill_arguments = {}
+        for key, value in the_data.items():
+            print("{}: {}".format(key, value))
+            if key !="the_drill":
+                drill_arguments[key] = value
+        the_drill_name = the_data["the_drill"]
+        the_drill_template = get_the_drill_by_name(all_the_drills, the_drill_name)
+
+        if len(the_data) > 1:
+            the_drill = engine.update_drill_arguments(the_drill_template, drill_arguments)
+        else:
+            the_drill = the_drill_template
+
+        engine.execute_the_drill(the_drill)
+
     return render_template("boxopsweb.html", context=context)
 
 
@@ -93,8 +111,8 @@ def get_drill_args():
             task_counter += 1
             if engine.is_key_present(the_task["task"], "args"):
                 for the_arg in the_task["task"]["args"]:
-                    args_inputs += "<b>{0}</b>:<br><input type=\"text\" name=\"step{1}_{0}\" value=\"{2}\">"\
-                        .format(the_arg, task_counter, the_task["task"]["args"][the_arg])
+                    args_inputs += "<br><b>{0}</b>:<br><input type=\"text\" name=\"task{1}_{0}\" value=\"{2}\"><br>"\
+                                    .format(the_arg, task_counter, the_task["task"]["args"][the_arg])
 
     else:
         args_inputs = "wrong method"

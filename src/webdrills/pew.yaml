@@ -2,25 +2,28 @@
 # * task - and end-unit ot execute
 # * argument - a variable parameter to use within a task
 ---
-name: "pew-pew!"  # required
+name: "Example of a drill"  # required
 tasks:  # required
   - task:  # required at least 1
       name: "first task"  # required
       args:
         message: "this is a message"
-      action: "printf \"{message}\""
+      action: "echo {message}"
       webhook:
         url: "https://discord.com/api/webhooks/798456482466627594/u3xQJY_dveJpW88_7WmtQSV9uUk02I0SW-CMOlBYa5HPANc4LIz3kcplLC8MyomYK8Xu"
         headers:
-          key: value
+          Content-Type: "application/json"
         data:
-          key: value
+          content: "hello"
   - task:  # required at least 1
       name: "second task"  # required
+      args:
+        msg: "pew!"
+      action: "echo {msg}"
       webhook:
         url: "https://discord.com/api/webhooks/798456482466627594/u3xQJY_dveJpW88_7WmtQSV9uUk02I0SW-CMOlBYa5HPANc4LIz3kcplLC8MyomYK8Xu"
         headers:
-          key: value
+          Content-Type: "application/json"
         data:
-          key: value
+          content: "{msg}-{msg}"
 
