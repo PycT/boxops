@@ -80,11 +80,11 @@
                     </select>
                 </td>
             </tr>
-            <tr id="drill_args">
-                <td>
-                    &nbsp;
-                </td>
-                <td>
+            <tr>
+                <td colspan=2 id="drill_args">
+                {% if context.args %}
+                    {{ context.args | safe}}
+                {% endif %}
                     &nbsp;
                 </td>
             </tr>

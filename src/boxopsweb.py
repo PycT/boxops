@@ -61,6 +61,20 @@ boxops_configuration = get_boxops_configuration()
 all_the_drills = collect_drills(boxops_configuration)
 
 
+def args_to_html_inputs(the_drill):
+    args_inputs = ""
+    task_counter = 0
+
+    for the_task in the_drill["tasks"]:
+        task_counter += 1
+        if engine.is_key_present(the_task["task"], "args"):
+            for the_arg in the_task["task"]["args"]:
+                args_inputs += "<br><b>{0}</b>:<br><input type=\"text\" name=\"task{1}_{0}\" value=\"{2}\"><br>" \
+                    .format(the_arg, task_counter, the_task["task"]["args"][the_arg])
+
+    return args_inputs
+
+
 @app.route("/", methods=["POST", "GET"])
 @app.route("/index", methods=["POST", "GET"])
 def index():
@@ -77,11 +91,15 @@ def index():
             print("{}: {}".format(key, value))
             if key !="the_drill":
                 drill_arguments[key] = value
+
         the_drill_name = the_data["the_drill"]
+        context["the_selected_drill"] = the_drill_name
+
         the_drill_template = get_the_drill_by_name(all_the_drills, the_drill_name)
 
         if len(the_data) > 1:
             the_drill = engine.update_drill_arguments(the_drill_template, drill_arguments)
+            context["args"] = args_to_html_inputs(the_drill)
         else:
             the_drill = the_drill_template
 
@@ -94,8 +112,6 @@ def index():
 def get_drill_args():
     global all_the_drills
 
-    args_inputs = ""
-
     if request.method == "POST":
         the_data = json.loads(request.data)
 
@@ -105,14 +121,8 @@ def get_drill_args():
             return ""
 
         the_drill = get_the_drill_by_name(all_the_drills, the_drill_name)
-        task_counter = 0
 
-        for the_task in the_drill["tasks"]:
-            task_counter += 1
-            if engine.is_key_present(the_task["task"], "args"):
-                for the_arg in the_task["task"]["args"]:
-                    args_inputs += "<br><b>{0}</b>:<br><input type=\"text\" name=\"task{1}_{0}\" value=\"{2}\"><br>"\
-                                    .format(the_arg, task_counter, the_task["task"]["args"][the_arg])
+        args_inputs = args_to_html_inputs(the_drill)
 
     else:
         args_inputs = "wrong method"
