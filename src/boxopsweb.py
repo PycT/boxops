@@ -55,10 +55,18 @@ def get_the_drill_by_name(all_the_drills, the_drill_name):
 
 app = Flask(__name__)
 log_path = os.getcwd() + "/log"
+blocker = log_path + "/drill.blk"
 boxops_logger = Logger(log_filename_postfix="boxopsweb", path_to_log=log_path)
 boxops_logger.writeDown("Starting boxopsweb webservice")
 boxops_configuration = get_boxops_configuration()
 all_the_drills = collect_drills(boxops_configuration)
+blocking_message = """
+<html>
+<body>
+    <h2>The drill is in progress, try 15 minutes later.</h2>
+</body>
+</html>
+"""
 
 
 def args_to_html_inputs(the_drill):
@@ -80,6 +88,10 @@ def args_to_html_inputs(the_drill):
 def index():
     global all_the_drills
     global boxops_configuration
+
+    if os.path.exists(blocker):
+        return blocking_message
+
     context = {
         "drills": all_the_drills
     }
@@ -103,7 +115,12 @@ def index():
         else:
             the_drill = the_drill_template
 
+        with open(blocker, "w") as blocking_flag:
+                blocking_flag.write(the_drill_name)
+
         engine.execute_the_drill(the_drill)
+
+        os.remove(blocker)
 
     return render_template("boxopsweb.html", context=context)
 
