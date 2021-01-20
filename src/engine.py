@@ -3,6 +3,7 @@ import yaml
 import requests
 import json
 import copy
+import os
 
 
 def load_yaml(yaml_file_name):
@@ -26,18 +27,21 @@ def is_class(the_entity, class_name):
     if the_entity.__class__.__name__ == class_name:
         return True
 
+    print("Expected: `{}`".format(class_name))
+
     return False
 
 
-def is_key_present(the_entity, the_key):
+def is_key_present(the_entity, the_key, verbose=False):
 
     try:
         if len(the_entity[the_key]) == 0:
             print("                No {} configured".format(the_key))
             return False
     except Exception as key_presence_failure:
-        print(key_presence_failure)
-        print("                No {} configured".format(the_key))
+        if verbose:
+            print(key_presence_failure)
+            print("                No {} configured".format(the_key))
         return False
 
     return True
@@ -100,7 +104,7 @@ def test_the_drill(the_drill):
             return False
 
         # Test name presence
-        if not is_key_present(the_task, "name"):
+        if not is_key_present(the_task, "name", True):
             print("            A name is required for any task")
             return False
 
@@ -162,7 +166,7 @@ def test_the_drill(the_drill):
                 the_task.pop("webhook", False)
             else:
                 # Test the url
-                if not is_key_present(the_task["webhook"], "url"):
+                if not is_key_present(the_task["webhook"], "url", True):
                     print("                An URL is required for a webhook")
                     return False
                 elif not is_class(the_task["webhook"]["url"], "str"):
@@ -172,13 +176,13 @@ def test_the_drill(the_drill):
                 print("                {}".format(the_task["webhook"]["url"]))
 
                 # Test headers
-                if is_key_present(the_task["webhook"], "headers"):
+                if is_key_present(the_task["webhook"], "headers", True):
                     if not is_class(the_task["webhook"]["headers"], "dict"):
                         print("            Webhook headers are misconfigured")
                         return False
 
                 # Test data
-                if is_key_present(the_task["webhook"], "data"):
+                if is_key_present(the_task["webhook"], "data", True):
                     if not is_class(the_task["webhook"]["data"], "dict"):
                         print("            Webhook data is misconfigured")
                         return False
@@ -187,7 +191,7 @@ def test_the_drill(the_drill):
             print("        {}".format(no_webhook_exception))
             print("        No webhook specified (ok)")
 
-        if is_key_present(the_task, "args"):
+        if is_key_present(the_task, "args", True):
             parametrized_task = apply_args(the_task)
             print("    The task with parameters applied: {}".format(parametrized_task))
 
@@ -206,7 +210,7 @@ def test_the_drill(the_drill):
         return False
 
     # Test drill name presence
-    if not is_key_present(the_drill, "name"):
+    if not is_key_present(the_drill, "name", True):
         print("A name is required for the drill")
         return False
 
@@ -217,7 +221,7 @@ def test_the_drill(the_drill):
     print("Testing the drill '{}'".format(the_drill["name"]))
 
     # Test tasks presence
-    if not is_key_present(the_drill, "tasks"):
+    if not is_key_present(the_drill, "tasks", True):
         print("No tasks configured")
         return False
 
