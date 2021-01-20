@@ -252,13 +252,15 @@ def execute_the_drill(the_drill):
         if is_key_present(the_task, "action"):
 
             if is_key_present(the_task, "directory"):
-                the_action = "cd {}; " + the_task["action"]
-            else:
-                the_action = the_task["action"]
+                if is_key_present(the_task, "user"):
+                    the_action = "cd {}; ".format(the_task["directory"]) + the_task["action"]
+                else:
+                    os.chdir(the_task["directory"])
+                    the_action = the_task["action"]
 
             if is_key_present(the_task, "user"):
                 execution_result = subprocess.run(
-                    ["runuser", "-l", the_task["user"], the_action],
+                    ["runuser", "-l", the_task["user"], "-c", the_action],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT
                 )
