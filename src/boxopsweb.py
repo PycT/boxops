@@ -121,7 +121,10 @@ def index():
         context["execution_output"] = engine.execute_the_drill(the_drill)
         boxops_logger.writeDown(context["execution_output"])
 
-        os.remove(blocker)
+        try:
+            os.remove(blocker)
+        except Exception as no_blocker_exception:
+            print(no_blocker_exception)
 
     return render_template("boxopsweb.html", context=context)
 
