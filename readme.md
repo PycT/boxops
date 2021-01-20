@@ -48,6 +48,9 @@ tasks:  # required
 
 Also see `example.yaml`
 
+ **Important Note:** for nested or complex commands, like `kill $(ps -aux | grep process_name | awk '$1 ~ \"username\" {print $2; exit;}')`
+specify the `user` field, even if it ought to be run on account of boxops process owner (e.g. `root`)
+
 # boxopsweb.py 
 boxopsweb is a server launched via WSGI, e.g. [gunicorn](https://gunicorn.org/)
 
