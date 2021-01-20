@@ -257,6 +257,9 @@ def execute_the_drill(the_drill):
                 else:
                     os.chdir(the_task["directory"])
                     the_action = the_task["action"]
+            else:
+                the_action = the_task["action"]
+
 
             if is_key_present(the_task, "user"):
                 execution_result = subprocess.run(
