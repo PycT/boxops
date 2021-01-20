@@ -33,11 +33,11 @@ def is_key_present(the_entity, the_key):
 
     try:
         if len(the_entity[the_key]) == 0:
-            print("No {} configured".format(the_key))
+            print("                No {} configured".format(the_key))
             return False
     except Exception as key_presence_failure:
         print(key_presence_failure)
-        print("No {} configured".format(the_key))
+        print("                No {} configured".format(the_key))
         return False
 
     return True
@@ -234,6 +234,8 @@ def test_the_drill(the_drill):
         if not test_the_task(the_task["task"]):
             return False
 
+    print("\n**********************************\n{} configuration looks ok\n**********************************\n"
+          .format(the_drill["name"]))
     return True
 
 

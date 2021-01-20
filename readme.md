@@ -6,14 +6,14 @@ boxops is a simple linux scripted drills automator
 # boxops 
 
 ```
-usage: boxops.py [-h] [-t]
+usage: python boxops.py [-h] [-t]
 
 optional arguments:
 -h, --help  show this help message and exit
 -t          test drills configurations
 ```
 
-boxops.py (has a soft link `boxops`) when launched executes serially all the drills found
+boxops.py when launched executes serially all the drills found
 in a `drills` folder near the boxops.
 
 One file - one drill.
