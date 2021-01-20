@@ -118,7 +118,8 @@ def index():
         with open(blocker, "w") as blocking_flag:
                 blocking_flag.write(the_drill_name)
 
-        context["execution_output"] = engine.execute_the_drill(the_drill)
+        the_drill_execution_output = engine.execute_the_drill(the_drill)
+        context["execution_output"] = the_drill_execution_output.replace("\n", "<br>")
         boxops_logger.writeDown(context["execution_output"])
 
         try:

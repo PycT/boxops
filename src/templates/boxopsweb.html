@@ -111,7 +111,7 @@
 {% if context.execution_output %}
 <br>
 <br>
-{{ context.execution_output }}
+{{ context.execution_output | safe }}
 {% endif %}
 <script>
     document.getElementById("reset_button")
