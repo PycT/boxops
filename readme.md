@@ -11,12 +11,15 @@ usage: python boxops.py [-h] [-t]
 optional arguments:
 -h, --help  show this help message and exit
 -t          test drills configurations
+-n N        filename of a drill to run or test. e.g. 'python boxops.py -t -n drill1.yaml'
+
 ```
 
 boxops.py when launched executes serially all the drills found
 in a `drills` folder near the boxops.
 
 One file - one drill.
+If no -n arguments specified, all the drills in a folder are run consecutively.
 
 The general structure of a drill yaml is as follows:
 

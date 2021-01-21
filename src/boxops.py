@@ -9,6 +9,7 @@ from rhythmic import Logger  # to exclude this dependency search through for Log
 def cli_parser_setup(cli_parser):
 
     cli_parser.add_argument("-t", help="test drills configurations", action="store_true")
+    cli_parser.add_argument("-n", help="filename of a drill to run or test. e.g. 'python boxops.py -t -n drill1.yaml'")
 
     return True
 
@@ -29,7 +30,7 @@ def get_boxops_configuration():
     return boxops_configuration
 
 
-def collect_drills(boxops_configuration):
+def collect_drills(boxops_configuration, particular_file=""):
     drills = []
     webdrills = []
     cwd = os.getcwd()
@@ -40,12 +41,20 @@ def collect_drills(boxops_configuration):
     drills_folder_list = os.listdir(drills_path)
     for item in drills_folder_list:
         if os.path.isfile(drills_path+"/"+item):
-            drills.append(drills_path+"/"+item)
+            if len(particular_file) > 0:
+                if item == particular_file:
+                    drills.append(drills_path+"/"+item)
+            else:
+                drills.append(drills_path+"/"+item)
 
     webdrills_folder_list = os.listdir(webdrills_path)
     for item in webdrills_folder_list:
         if os.path.isfile(webdrills_path+"/"+item):
-            webdrills.append(webdrills_path+"/"+item)
+            if len(particular_file) > 0:
+                if item == particular_file:
+                    webdrills.append(webdrills_path+"/"+item)
+            else:
+                webdrills.append(webdrills_path+"/"+item)
 
     return drills, webdrills
 
@@ -78,7 +87,11 @@ def main():
     cli_parser_setup(cli_parser)
     cli_args = cli_parser.parse_args()
     boxops_configuration = get_boxops_configuration()
-    all_the_drills = collect_drills(boxops_configuration)
+
+    if cli_args.n:
+        all_the_drills = collect_drills(boxops_configuration, cli_args.n)
+    else:
+        all_the_drills = collect_drills(boxops_configuration)
 
     log_path = os.getcwd() + "/log"
     boxops_logger = Logger(log_filename_postfix="boxops", path_to_log=log_path)
