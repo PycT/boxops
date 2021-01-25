@@ -120,7 +120,7 @@ def index():
 
         the_drill_execution_output = engine.execute_the_drill(the_drill)
         context["execution_output"] = the_drill_execution_output.replace("\n", "<br>")
-        boxops_logger.writeDown(context["execution_output"])
+        boxops_logger.writeDown(the_drill_execution_output)
 
         try:
             os.remove(blocker)
