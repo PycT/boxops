@@ -1,3 +1,9 @@
+# Prerequisites
+
+```
+pip install flask requests rhythmic
+```
+
 boxops is a simple linux scripted drills automator
 
 * boxops
