@@ -253,6 +253,7 @@ def execute_the_drill(the_drill):
             the_task = the_task_template
 
         execution_output = "\n Executing task: {} \n".format(the_task["name"])
+        print(execution_output)
         if is_key_present(the_task, "action"):
 
             if is_key_present(the_task, "directory"):
@@ -278,7 +279,9 @@ def execute_the_drill(the_drill):
                     stderr=subprocess.STDOUT
                 )
 
-            execution_output += execution_result.stdout.decode()
+            result_output = execution_result.stdout.decode()
+            execution_output += result_output
+            print(result_output)
 
         if is_key_present(the_task, "webhook"):
             if is_key_present(the_task["webhook"], "data"):
